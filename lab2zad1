@@ -1,0 +1,81 @@
+import pygame
+import math
+pygame.init()
+screen_width, screen_height = 600, 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+WHITE = (255, 255, 255)
+BlACK = (0,0,0)
+angle = 0
+scale = 1.0
+is_trapezoid = False
+italic = False  #
+italic1 = False
+mirror = False
+mirror1 = False
+center_y = screen_height // 2
+center_x = screen_width // 2
+def draw_polygon(surface, color, vertices):
+    pygame.draw.polygon(surface, color, vertices)
+def get_polygon_vertices(center, radius, sides, rotation=0, scale=1.0, is_trapezoid=False, italic=False, italic1=False, mirror= False, mirror1 = False  ):
+    vertices = []
+    for i in range(sides):
+        angle = math.radians(rotation + (360 / sides) * i)
+        if is_trapezoid and i % 2 == 0:
+            offset = radius * 0.2
+        else:
+            offset = 0
+        x = center[0] + (radius + offset) * math.cos(angle) * scale
+        y = center[1] + (radius + offset) * math.sin(angle) * scale
+        if italic:
+            x += (y - center[1]) * 0.3
+        if italic1:
+            y += (x - center[0]) * 0.3
+        if mirror:
+            x = 2 * center[0] - x
+        if mirror1:
+            x = center[0] - (x - center[0])
+        vertices.append((x, y))
+    return vertices
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_2:
+                angle += 45
+                scale = 1.2
+                is_trapezoid = False
+            elif event.key == pygame.K_3:
+                scale = 1
+                angle += 90
+                is_trapezoid = False
+            elif event.key == pygame.K_4:
+                italic = not italic
+            elif event.key == pygame.K_5:
+                italic = not italic
+                center_y = 150
+            elif event.key == pygame.K_6:
+                italic = not italic
+                italic1 = not italic1
+                center_y = 300
+            elif event.key == pygame.K_7:
+                italic = not italic
+                italic1 = not italic1
+                mirror = not mirror
+            elif event.key == pygame.K_8:
+                mirror = not mirror
+                center_y = 450
+                angle += 30  # Obrót o 45 stopni
+            elif event.key == pygame.K_9:
+                center_y = 300
+                italic = not italic
+                angle += 30  # Obrót o 45 stopni
+                center_x = screen_width - 150
+    #
+    screen.fill(WHITE)
+    vertices = get_polygon_vertices((center_x, center_y), 150, 13, angle, scale, is_trapezoid, italic, mirror, mirror1, italic1)
+    draw_polygon(screen, BlACK, vertices)
+    pygame.display.flip()
+    pygame.time.wait(10)
+pygame.quit()
